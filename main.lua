@@ -19,8 +19,8 @@ local player = {
 
 
 function love.load()
-   love.window.setTitle("orbrescue")
-   love.mouse.setVisible(false)
+    love.mouse.setVisible(false)
+    love.graphics.setDefaultFilter("nearest", "nearest")
 end 
 
 function love.update(dt)
