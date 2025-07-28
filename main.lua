@@ -11,7 +11,9 @@ local game = {
         paused = false,
         running = false,
         gameover = false,
-    }
+    },
+    points = 0,
+    levels = {15, 30, 45, 60, 75},
 }
 
 local player = Player() 
@@ -22,16 +24,22 @@ local buttons = {
 
 local enemies = {}
 
-function love.load()
-    love.mouse.setVisible(false)
-    love.graphics.setDefaultFilter("nearest", "nearest")
+local function changeGameState(state)
+    game.state.menu = state == "menu"
+    game.state.running = state == "running"
+    game.state.paused = state == "paused"
+    game.state.gameover = state == "gameover"
 
-    buttons.menu_state.play_game = button("Play Game", nil, nil, 200, 50)
-    buttons.menu_state.settings = button("Settings", nil, nil, 200, 50)
-    buttons.menu_state.exit_game = button("Quit Game", love.event.quit, nil, 200, 50)
+end
 
-    table.insert(enemies, 1, enemy())
+local function startNewGame()
+    changeGameState("running")
 
+    game.points = 0
+
+    enemies = {
+        enemy(1)
+    }
 end
 
 function love.mousepressed(x, y, button)
@@ -46,20 +54,52 @@ function love.mousepressed(x, y, button)
     end
 end
 
+function love.load()
+    love.mouse.setVisible(false)
+    love.graphics.setDefaultFilter("nearest", "nearest")
+
+    buttons.menu_state.play_game = button("Play Game", startNewGame, nil, 200, 50)
+    buttons.menu_state.settings = button("Settings", nil, nil, 200, 50)
+    buttons.menu_state.exit_game = button("Quit Game", love.event.quit, nil, 200, 50)
+
+    
+
+end
+
+
 function love.update(dt)
     local mouse_x, mouse_y = love.mouse.getPosition()
     player:move(mouse_x, mouse_y)
+
+    if game.state.running then
+        for i = 1, #enemies do
+            if not enemies[i]:isTouched(player.x,player.y,player.radius) then
+                enemies[i]:move(player.x, player.y)
+                for i = 1, #game.levels do
+                    if math.floor(game.points) == game.levels[i] then
+                        table.insert(enemies, 1, enemy(game.difficulty * (i + 1)))
+
+                        game.points = game.points + 1
+                    end
+                end
+                else
+                    changeGameState("menu")
+                end
+            end
     
-    for i = 1, #enemies do
-        enemies[i]:move(player.x, player.y)
+        end
+        game.points = game.points + dt
     end
-end
+    
+
 
 function love.draw()
     love.graphics.setColor(108/255,56/255,245/255)
     love.graphics.print("FPS: "..love.timer.getFPS(), love.graphics.newFont(18), love.graphics.getWidth() - 100, love.graphics.getHeight() - 35)
     
     if game.state.running then
+
+        love.graphics.printf("Points: " .. math.floor(game.points), love.graphics.newFont(25), 10, 10, love.graphics.getWidth(), "left")
         for i = 1, #enemies do
             enemies[i]:draw()
         end
