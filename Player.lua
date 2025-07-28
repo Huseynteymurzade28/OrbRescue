@@ -1,8 +1,11 @@
 local love = require("love")
 
 function Player()
+
+    local _image = love.graphics.newImage("assets/Player.png")
+
     return {
-        radius = 20,
+        radius = 21,
         x = 30,
         y = 30,
 
@@ -12,7 +15,7 @@ function Player()
         end,
 
         draw = function (self)
-            love.graphics.circle("fill", self.x, self.y, self.radius)
+            love.graphics.draw(_image, self.x - self.radius, self.y - self.radius)
         end
     }
 end

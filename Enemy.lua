@@ -3,7 +3,8 @@ local love = require("love")
 function Enemy(_level)
     local dice = math.random(1, 4)
     local _x, _y = 0, 0
-    local _radius = 20
+    local _radius = 21
+    local _image = love.graphics.newImage("assets/Enemy.png")
 
     if dice == 1 then   
         _x = math.random(0, love.graphics.getWidth())
@@ -42,9 +43,8 @@ function Enemy(_level)
         end,
 
         draw = function (self)
-            love.graphics.setColor(1, 0, 0) -- Set color to red
-            love.graphics.circle("fill", self.x, self.y, self.radius)
             love.graphics.setColor(1, 1, 1) -- Reset color to white
+            love.graphics.draw(_image, self.x - self.radius, self.y - self.radius)
         end
     }
 end
